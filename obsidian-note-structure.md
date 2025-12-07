@@ -21,13 +21,9 @@ Example: `239. Sliding Window Maximum.md`
 
 ```yaml
 ---
-date: 2025-12-06T23:16
-description:
 tags:
-  - algorithm/dynamic-programming
-  - algorithm/prefix-sum
-  - data-structure/queue
-reviewed:
+  - algorithm/two-pointer
+  - data-structure/array
 ---
 ```
 
@@ -36,11 +32,8 @@ reviewed:
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `tags` | list | ✓ | Tags with configured prefixes (e.g., `algorithm/`, `data-structure/`) |
-| `date` | datetime | Optional | Note creation date |
-| `description` | string | Optional | Brief description |
-| `reviewed` | datetime | Optional | Last review date |
 
-**Note:** Tags with configured prefixes (from `config.yaml`) will be displayed on the Anki card as pattern tags.
+**Note:** Only tags with configured prefixes (from `config.yaml`) will be displayed on the Anki card as pattern tags.
 
 ---
 
@@ -51,7 +44,7 @@ The sync tool extracts specific sections from your markdown content:
 ### 1. LeetCode Link (Required)
 
 ```markdown
-🔗 [LeetCode](https://leetcode.com/problems/sliding-window-maximum/description)
+🔗 [LeetCode](https://leetcode.com/problems/trapping-rain-water/description)
 ```
 
 - Must contain a link with text "LeetCode" pointing to the problem URL
@@ -63,7 +56,7 @@ The sync tool extracts specific sections from your markdown content:
 ## Key Insight
 
 > [!tip]- What's the trick?
-> The core insight is to maintain a monotonic decreasing queue...
+> Water trapped at position depends on minimum of max heights to its left and right. Use two pointers moving inward, tracking max heights from both ends.
 ```
 
 - Section header: `## Key Insight`
@@ -76,11 +69,13 @@ The sync tool extracts specific sections from your markdown content:
 ```markdown
 ## Derivation
 
-1. Define $dp[i + 1]$ as the number of valid partition for $nums[0,i]$.
-2. Identify the DP recurrence relation: $dp[i + 1] = dp[j] + \dots + dp[i]$
-    - Use prefix sum.
-3. If $nums[j,i]$ is a valid segment, then for each $j < L <= i$...
-    - Use sliding window to keep track the $L$.
+1. Water trapped at index $i$ equals: $\min(\text{maxLeft}[i], \text{maxRight}[i]) - \text{height}[i]$
+2. We can avoid precomputing all max values by using two pointers
+    - Track running maximum from left side
+    - Track running maximum from right side
+3. Move pointer with smaller max height inward
+    - The side with smaller max determines water level
+    - Safe to calculate water at that position
 ```
 
 - Section header: `## Derivation`
@@ -94,14 +89,19 @@ The sync tool extracts specific sections from your markdown content:
 ```markdown
 ## Algorithm
 
-1. Initialize a list 'DP' to store partition counts
-2. Set base case: DP[0] = 1 (1 way to partition nothing)
-3. FOR each number 'X' in Sequence:
-    1. UPDATE WINDOW
-        - Include 'X' in the current window.
-    2. SHRINK WINDOW (Constraint Check)
-        - WHILE (Window.Max - Window.Min > K):
-            - Remove elements from the start
+1. Initialize LEFT and RIGHT pointers at both ends
+2. Initialize MAXLEFT and MAXRIGHT to track maximum heights
+3. Initialize RESULT to accumulate trapped water
+4. WHILE LEFT < RIGHT:
+    1. IF height[LEFT] < height[RIGHT]:
+        - Update MAXLEFT with current height
+        - Add trapped water: MAXLEFT - height[LEFT]
+        - Move LEFT pointer inward
+    2. ELSE:
+        - Update MAXRIGHT with current height
+        - Add trapped water: MAXRIGHT - height[RIGHT]
+        - Move RIGHT pointer inward
+5. RETURN total water trapped
 ```
 
 - Section header: `## Algorithm`
@@ -114,8 +114,8 @@ The sync tool extracts specific sections from your markdown content:
 ```markdown
 ## Complexity
 
-- **Time:** $O(n)$
-- **Space:** $O(n)$
+- **Time:** $O(n)$ - single pass through array
+- **Space:** $O(1)$ - only use constant extra space
 ```
 
 - Section header: `## Complexity`
@@ -130,12 +130,9 @@ File: `42. Trapping Rain Water.md`
 
 ```markdown
 ---
-date: 2024-01-15T10:30
-description: Calculate trapped rainwater using two-pointer approach
 tags:
   - algorithm/two-pointer
   - data-structure/array
-reviewed: 2024-02-01T14:20
 ---
 
 # 42. Trapping Rain Water
