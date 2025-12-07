@@ -1,0 +1,540 @@
+/* LeetCode Cards with Prettify Nord Theme
+   Based on Prettify by @pranavdeshai
+   Adapted for LeetCode problem cards
+*/
+
+/* ================================================== CONFIGURATION */
+
+:root {
+  --card-max-width: 50em;
+  --card-text-align: left;
+  --font-size-regular: 16px;
+  --font-size-small: 14px;
+  --font-size-large: 18px;
+  --font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --code-font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Courier New', monospace;
+}
+
+/* ================================================== COLORS */
+
+.card {
+  /* Light theme - Nord */
+  background-color: #ececec;
+  --text-fg: #2e3440;
+  --text-fg-faint: #4c566a;
+  --text-bg-selected: #eceff4;
+  --card-bg: #ffffff;
+  --card-border: transparent;
+  --card-box-shadow: #b8c2d740;
+  --divider: #d8dee9;
+
+  --tag-fg: #2e3440;
+  --tag-bg: #88c0d0;
+  --tag-fg-hover: #eceff4;
+  --tag-bg-hover: #81a1c1;
+  --tag-border: #88c0d0;
+
+  --problem-title-fg: #2e3440;
+  --example-bg: #eceff4;
+  --example-border: #88c0d0;
+  --constraint-bg: #ebcb8b20;
+  --constraint-fg: #5e4d2c;
+  --constraint-border: #ebcb8b;
+
+  --insight-bg: #ebcb8b30;
+  --insight-fg: #5e4d2c;
+  --insight-border: #ebcb8b;
+  --derivation-bg: #a3be8c30;
+  --derivation-fg: #3d5634;
+  --derivation-border: #a3be8c;
+  --algorithm-bg: #81a1c130;
+  --algorithm-fg: #2e3440;
+  --algorithm-border: #81a1c1;
+
+  --complexity-bg: #e5e9f0;
+  --complexity-fg: #4c566a;
+  --link-fg: #5e81ac;
+  --link-fg-hover: #81a1c1;
+  --link-bg-hover: #eceff420;
+}
+
+.card.night_mode {
+  /* Dark theme - Nord */
+  background-color: #242933;
+  --text-fg: #e5e9f0;
+  --text-fg-faint: #d8dee9;
+  --text-bg-selected: #3b4252;
+  --card-bg: #2e3440;
+  --card-border: transparent;
+  --card-box-shadow: #0f111540;
+  --divider: #4c566a;
+
+  --tag-fg: #2e3440;
+  --tag-bg: #88c0d0;
+  --tag-fg-hover: #2e3440;
+  --tag-bg-hover: #8fbcbb;
+  --tag-border: #88c0d0;
+
+  --problem-title-fg: #eceff4;
+  --example-bg: #3b4252;
+  --example-border: #88c0d0;
+  --constraint-bg: #ebcb8b15;
+  --constraint-fg: #ebcb8b;
+  --constraint-border: #ebcb8b;
+
+  --insight-bg: #ebcb8b20;
+  --insight-fg: #ebcb8b;
+  --insight-border: #ebcb8b;
+  --derivation-bg: #a3be8c20;
+  --derivation-fg: #a3be8c;
+  --derivation-border: #a3be8c;
+  --algorithm-bg: #81a1c120;
+  --algorithm-fg: #d8dee9;
+  --algorithm-border: #81a1c1;
+
+  --complexity-bg: #3b4252;
+  --complexity-fg: #d8dee9;
+  --link-fg: #88c0d0;
+  --link-fg-hover: #8fbcbb;
+  --link-bg-hover: #3b425220;
+}
+
+/* ================================================== CARD LAYOUT */
+
+.card {
+  cursor: default;
+  padding: 0.5em 0;
+}
+
+html:not(.mobile) .card {
+  padding: 0.5em;
+}
+
+.card::-webkit-scrollbar {
+  display: none;
+}
+
+.leetcode-card {
+  background-color: var(--card-bg);
+  border-radius: 0.75em;
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-box-shadow) 0px 8px 16px;
+  color: var(--text-fg);
+  font-family: var(--font-family);
+  font-size: var(--font-size-regular);
+  line-height: 1.6;
+  margin: 0 auto;
+  max-width: var(--card-max-width);
+  text-align: var(--card-text-align);
+  word-wrap: break-word;
+}
+
+.leetcode-card ::selection {
+  background-color: var(--text-bg-selected);
+}
+
+.lc-section {
+  margin: 1.5em 2em;
+}
+
+.mobile .lc-section {
+  margin: 1.25em 1.5em;
+}
+
+.lc-divider {
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid var(--divider);
+  margin: 1.5em 2em;
+}
+
+.mobile .lc-divider {
+  margin: 1.25em 1.5em;
+}
+
+/* ================================================== PROBLEM HEADER */
+
+.problem-header {
+  border-bottom: 2px solid var(--divider);
+  padding-bottom: 1em;
+  margin: 1.5em 2em 0;
+}
+
+.mobile .problem-header {
+  margin: 1.25em 1.5em 0;
+}
+
+.problem-title {
+  font-size: var(--font-size-large);
+  font-weight: 700;
+  color: var(--problem-title-fg);
+  margin-bottom: 0.75em;
+  letter-spacing: -0.01em;
+}
+
+/* ================================================== TAGS */
+
+.pattern-tags {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 0.5em;
+  margin-bottom: 1em;
+}
+
+.pattern-tag {
+  background-color: var(--tag-bg);
+  color: var(--tag-fg);
+  padding: 0.35em 0.85em;
+  border-radius: 1em;
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: 1px solid var(--tag-border);
+}
+
+.pattern-tag:hover {
+  background-color: var(--tag-bg-hover);
+  color: var(--tag-fg-hover);
+  transform: translateY(-1px);
+  cursor: pointer;
+}
+
+/* ================================================== PROBLEM DESCRIPTION */
+
+.problem-description {
+  line-height: 1.7;
+  color: var(--text-fg);
+}
+
+/* ================================================== EXAMPLES */
+
+.examples {
+  margin: 1em 0;
+}
+
+.example-block {
+  background-color: var(--example-bg);
+  border-left: 3px solid var(--example-border);
+  padding: 1em 1.25em;
+  margin: 0.75em 0;
+  border-radius: 0.5em;
+}
+
+.example-header {
+  font-weight: 700;
+  color: var(--text-fg);
+  margin-bottom: 0.5em;
+}
+
+.example-content {
+  color: var(--text-fg-faint);
+  font-size: var(--font-size-small);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.example-content p {
+  margin: 0.5em 0;
+  white-space: pre-wrap;
+}
+
+.example-content p:first-child {
+  margin-top: 0;
+}
+
+.example-content code {
+  color: var(--text-fg);
+}
+
+/* ================================================== CONSTRAINTS */
+
+.constraints {
+  background-color: var(--constraint-bg);
+  border-left: 3px solid var(--constraint-border);
+  padding: 1em 1.25em;
+  margin: 1em 0;
+  border-radius: 0.5em;
+}
+
+.constraints-header {
+  font-weight: 700;
+  color: var(--constraint-fg);
+  margin-bottom: 0.5em;
+}
+
+.constraints ul {
+  color: var(--constraint-fg);
+  font-size: var(--font-size-small);
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+  list-style-type: disc;
+}
+
+.constraints li {
+  margin: 0.35em 0;
+  padding-left: 0.25em;
+}
+
+/* ================================================== SOLUTION SECTIONS */
+
+.key-insight,
+.derivation,
+.algorithm {
+  border-left: 4px solid;
+  padding: 1.25em 1.5em;
+  margin: 1em 0;
+  border-radius: 0.5em;
+}
+
+.key-insight {
+  background-color: var(--insight-bg);
+  border-color: var(--insight-border);
+}
+
+.derivation {
+  background-color: var(--derivation-bg);
+  border-color: var(--derivation-border);
+}
+
+.algorithm {
+  background-color: var(--algorithm-bg);
+  border-color: var(--algorithm-border);
+}
+
+.insight-header,
+.derivation-header,
+.algorithm-header {
+  font-size: var(--font-size-regular);
+  font-weight: 700;
+  margin-bottom: 0.75em;
+}
+
+.insight-header {
+  color: var(--insight-fg);
+}
+
+.insight-header::before {
+  content: "💡 ";
+}
+
+.derivation-header {
+  color: var(--derivation-fg);
+}
+
+.derivation-header::before {
+  content: "📐 ";
+}
+
+.algorithm-header {
+  color: var(--algorithm-fg);
+}
+
+.algorithm-header::before {
+  content: "🔄 ";
+}
+
+/* ================================================== COMPLEXITY */
+
+.complexity {
+  background-color: var(--complexity-bg);
+  padding: 1em 1.25em;
+  margin: 1em 0;
+  border-radius: 0.5em;
+  font-family: var(--code-font-family);
+  font-size: var(--font-size-small);
+  color: var(--complexity-fg);
+}
+
+/* ================================================== LINKS */
+
+.links {
+  margin-top: 1.5em;
+  padding-top: 1.25em;
+  border-top: 1px solid var(--divider);
+  display: flex;
+  gap: 1.5em;
+  flex-wrap: wrap;
+}
+
+.link {
+  color: var(--link-fg);
+  text-decoration: none;
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  padding: 0.25em 0.5em;
+  border-radius: 0.35em;
+  transition: all 0.2s ease;
+}
+
+.link:hover {
+  color: var(--link-fg-hover);
+  background-color: var(--link-bg-hover);
+  transform: translateX(2px);
+}
+
+/* ================================================== CODE */
+
+pre {
+  background-color: var(--example-bg);
+  padding: 1em;
+  border-radius: 0.5em;
+  overflow-x: auto;
+  font-family: var(--code-font-family);
+  font-size: var(--font-size-small);
+}
+
+code {
+  font-family: var(--code-font-family);
+  font-size: 0.9em;
+  background-color: var(--example-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 0.25em;
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+/* ================================================== LISTS */
+
+ol,
+ul {
+  margin: 0.75em 0;
+  padding-left: 2em;
+  line-height: 1.8;
+}
+
+ol {
+  list-style-type: decimal;
+}
+
+ul {
+  list-style-type: disc;
+}
+
+li {
+  margin: 0.5em 0;
+  padding-left: 0.25em;
+}
+
+ol ol {
+  list-style-type: lower-alpha;
+  margin: 0.35em 0;
+}
+
+ol ol ol {
+  list-style-type: lower-roman;
+}
+
+ul ul {
+  list-style-type: circle;
+}
+
+.algorithm-steps {
+  counter-reset: step-counter;
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.algorithm-steps > li {
+  counter-increment: step-counter;
+  position: relative;
+  padding-left: 2.5em;
+  margin: 0.75em 0;
+}
+
+.algorithm-steps > li::before {
+  content: counter(step-counter) ".";
+  position: absolute;
+  left: 0;
+  font-weight: 700;
+  color: var(--algorithm-border);
+}
+
+.derivation-steps > li,
+.derivation-items > li {
+  margin: 0.6em 0;
+}
+
+/* ================================================== MATHJAX */
+
+.MathJax_Display {
+  margin: 0.75em 0 !important;
+}
+
+/* ================================================== TEXT FORMATTING */
+
+b,
+strong {
+  color: var(--text-fg);
+  font-weight: 700;
+}
+
+i,
+em {
+  font-style: italic;
+}
+
+u {
+  text-decoration: underline;
+}
+
+p {
+  margin: 0.75em 0;
+  line-height: 1.7;
+}
+
+p:first-child {
+  margin-top: 0;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+/* ================================================== IMAGES */
+
+img {
+  border-radius: 0.5em;
+  display: block;
+  margin: 1em auto;
+  max-width: 80% !important;
+  box-shadow: var(--card-box-shadow) 0px 4px 8px;
+}
+
+/* ================================================== TABLES */
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 1em auto;
+  max-width: 100%;
+  border-radius: 0.5em;
+  overflow: hidden;
+}
+
+table thead {
+  background-color: var(--text-bg-selected);
+}
+
+table tr:nth-of-type(even) {
+  background-color: var(--text-bg-selected);
+}
+
+table th,
+table td {
+  padding: 0.75em;
+  border: 1px solid var(--divider);
+}
+
+table th {
+  font-weight: 700;
+  color: var(--text-fg);
+}
+
+table td {
+  color: var(--text-fg-faint);
+}

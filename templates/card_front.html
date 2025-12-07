@@ -1,0 +1,31 @@
+<div class="leetcode-card">
+  <div class="problem-header">
+    <div class="problem-title">
+      {{#ProblemNumber}}{{ProblemNumber}}. {{/ProblemNumber}}{{ProblemTitle}}
+    </div>
+    {{#PatternTagsFront}}
+    <div class="pattern-tags">
+      {{PatternTagsFront}}
+    </div>
+    {{/PatternTagsFront}}
+  </div>
+
+  {{#ProblemDescription}}
+  <div class="lc-section problem-description">
+    {{ProblemDescription}}
+  </div>
+  {{/ProblemDescription}}
+
+  {{#ProblemExamples}}
+  <div class="lc-section examples">
+    {{ProblemExamples}}
+  </div>
+  {{/ProblemExamples}}
+
+  {{#ProblemConstraints}}
+  <div class="lc-section constraints">
+    <div class="constraints-header">Constraints:</div>
+    {{ProblemConstraints}}
+  </div>
+  {{/ProblemConstraints}}
+</div>

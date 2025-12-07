@@ -1,0 +1,44 @@
+# Anki Sync Configuration
+
+anki:
+  url: "http://localhost:8765"
+
+  # Anki deck name (will be created if doesn't exist)
+  deck_name: "LeetCode"
+
+  # Anki note type (will be created if doesn't exist)
+  model_name: "LeetCode Problem"
+
+  # Optional: API key if configured in AnkiConnect
+  api_key: null
+
+obsidian:
+  # Absolute path to vault
+  vault_path: "/path/to/your/vault"
+
+  # Relative path to LeetCode problems
+  problems_path: "LeetCode/problems"
+
+  # Vault name for obsidian:// URLs
+  vault_name: "YourVaultName"
+
+sync:
+  # Tag prefixes to include on cards
+  tag_prefixes:
+    - "algorithm/"
+    - "data-structure/"
+
+  # Skip files with these tags
+  exclude_tags:
+    - "wip"
+    - "draft"
+
+card:
+  # Include tags on front of card
+  show_tags: false
+
+  # Include LeetCode link on back
+  show_leetcode_link: true
+
+  # Maximum tags to display (rest hidden)
+  max_tags_display: 3
