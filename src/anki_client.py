@@ -118,9 +118,7 @@ class AnkiConnect:
         expected_fields = [
             "ProblemNumber",
             "ProblemTitle",
-            "ProblemDescription",
-            "ProblemExamples",
-            "ProblemConstraints",
+            "ProblemContent",
             "PatternTagsFront",
             "PatternTagsBack",
             "KeyInsight",

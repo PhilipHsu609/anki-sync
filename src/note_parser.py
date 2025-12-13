@@ -25,22 +25,26 @@ class LeetCodeNote:
         with open(self.file_path, 'r', encoding='utf-8') as f:
             full_content = f.read()
 
-        # Extract frontmatter
-        frontmatter_match = re.match(r'^---\s*\n(.*?)\n---\s*\n', full_content, re.DOTALL)
-        if frontmatter_match:
-            self.frontmatter = yaml.safe_load(frontmatter_match.group(1)) or {}
-            self.content = full_content[frontmatter_match.end():]
+        # Extract frontmatter (YAML between --- markers)
+        if full_content.startswith('---'):
+            parts = full_content.split('---', 2)
+            if len(parts) >= 3:
+                try:
+                    self.frontmatter = yaml.safe_load(parts[1]) or {}
+                    self.content = parts[2].lstrip('\n')
+                except yaml.YAMLError as e:
+                    logging.warning(f"Failed to parse frontmatter in {self.file_path.name}: {e}")
+                    self.content = full_content
+            else:
+                self.content = full_content
         else:
             self.content = full_content
 
-        # Extract key insight from callout
-        callout_match = re.search(
-            r'>\s*\[!tip\]-?\s*What\'s the trick\?\s*\n>\s*(.*?)(?:\n>|(?:\n(?!>)))',
-            self.content,
-            re.DOTALL
-        )
-        if callout_match:
-            self.key_insight = callout_match.group(1).strip().replace('> ', '')
+        # Extract key insight from callout (more flexible pattern)
+        # Matches: > [!tip] What's the trick?
+        #          > Key insight text here
+        #          > Can be multiple lines
+        self.key_insight = self._extract_callout_content()
 
     def extract_problem_number(self) -> str:
         """Extract problem number from filename."""
@@ -67,42 +71,92 @@ class LeetCodeNote:
         return pattern_tags[:self.config['card']['max_tags_display']]
 
     def extract_leetcode_link(self) -> str:
-        """Extract LeetCode URL."""
-        if match := re.search(r'\[LeetCode\]\((https://leetcode\.com/[^)]+)\)', self.content):
-            return match.group(1)
+        """
+        Extract LeetCode URL from note.
+        Looks for [LeetCode](url) or [LC](url) format.
+        """
+        # Try common patterns
+        patterns = [
+            r'\[LeetCode\]\((https://leetcode\.com/[^)]+)\)',
+            r'\[LC\]\((https://leetcode\.com/[^)]+)\)',
+            r'(https://leetcode\.com/problems/[^\s\)]+)',  # Bare URL
+        ]
+
+        for pattern in patterns:
+            if match := re.search(pattern, self.content, re.IGNORECASE):
+                return match.group(1)
+
+        return ""
+
+    def _extract_callout_content(self) -> str:
+        """
+        Extract content from Obsidian callout block.
+        Handles: > [!tip] What's the trick? or similar variants.
+        """
+        lines = self.content.split('\n')
+        callout_lines = []
+        in_callout = False
+        callout_started = False
+
+        for line in lines:
+            # Start of callout: > [!tip] or > [!note] etc.
+            if re.match(r'>\s*\[!(?:tip|note|info)\]', line, re.IGNORECASE):
+                in_callout = True
+                callout_started = True
+                continue
+
+            # Inside callout
+            if in_callout:
+                if line.startswith('>'):
+                    # Remove leading > and whitespace
+                    content = line.lstrip('>').strip()
+                    if content:
+                        callout_lines.append(content)
+                else:
+                    # End of callout (line doesn't start with >)
+                    break
+
+        return '\n'.join(callout_lines) if callout_lines else ""
+
+    def _extract_section(self, heading: str) -> str:
+        """
+        Extract content from a markdown section by heading.
+        More robust than regex - splits on ## headings and finds the right one.
+        """
+        # Split content into sections by ## headings
+        sections = re.split(r'\n##\s+', '\n' + self.content)
+
+        for section in sections:
+            lines = section.split('\n', 1)
+            if not lines:
+                continue
+
+            section_heading = lines[0].strip()
+            section_content = lines[1] if len(lines) > 1 else ""
+
+            # Case-insensitive match for the heading
+            if section_heading.lower() == heading.lower():
+                # Clean up the content
+                content = section_content.strip()
+                # Remove HTML comments
+                content = re.sub(r'<!--.*?-->', '', content, flags=re.DOTALL)
+                # Remove code fences that might appear before next section
+                content = re.split(r'\n```', content)[0].strip()
+                return content
+
         return ""
 
     def extract_complexity(self) -> str:
         """Extract complexity from ## Complexity section."""
-        if match := re.search(
-            r'##\s+Complexity\s*\n(.*?)(?:\n\s*##|\n\s*```|\Z)',
-            self.content,
-            re.DOTALL
-        ):
-            complexity_text = re.sub(r'\*\*|\`', '', match.group(1).strip())
-            return re.sub(r'\s+', ' ', complexity_text)
-        return ""
+        return self._extract_section("Complexity")
 
     def extract_algorithm(self) -> str:
         """Extract algorithm steps from ## Algorithm section."""
-        if match := re.search(
-            r'##\s+Algorithm\s*\n(.*?)(?:\n\s*##|\n\s*```|\Z)',
-            self.content,
-            re.DOTALL
-        ):
-            return re.sub(r'\n\s*\n\s*\n', '\n\n', match.group(1).strip())
-        return ""
+        return self._extract_section("Algorithm")
 
     def extract_derivation(self) -> str:
-        """Extract derivation section (optional for math-heavy problems)."""
-        if match := re.search(
-            r'##\s+Derivation\s*\n(.*?)(?:\n\s*##|\Z)',
-            self.content,
-            re.DOTALL
-        ):
-            deriv_text = re.sub(r'<!--.*?-->', '', match.group(1), flags=re.DOTALL).strip()
-            return deriv_text if deriv_text and not deriv_text.isspace() else ""
-        return ""
+        """Extract derivation from ## Derivation section."""
+        return self._extract_section("Derivation")
 
     def should_sync(self) -> bool:
         """Check if this note should be synced to Anki."""
@@ -151,9 +205,7 @@ class LeetCodeNote:
         pattern_tags_back = pattern_tags_html
 
         # Fetch problem details from LeetCode
-        problem_description = ""
-        problem_examples = ""
-        problem_constraints = ""
+        problem_content = ""
 
         if leetcode_url and leetcode_fetcher:
             logging.info(f"Fetching problem details from LeetCode: {leetcode_url}")
@@ -161,26 +213,8 @@ class LeetCodeNote:
                 problem_data = leetcode_fetcher.fetch_problem(leetcode_url)
 
                 if problem_data:
-                    # LeetCode API returns HTML directly
-                    problem_description = problem_data.get('description', '')
-
-                    # Format examples with headers
-                    examples = problem_data.get('examples', [])
-                    if examples:
-                        example_blocks = []
-                        for ex in examples[:2]:
-                            block = f'''<div class="example-block">
-    <div class="example-header">Example {ex['number']}:</div>
-    <div class="example-content">{ex['html']}</div>
-</div>'''
-                            example_blocks.append(block)
-                        problem_examples = '\n'.join(example_blocks)
-
-                    # Constraints are already in <li> format, just wrap in <ul>
-                    constraints_html = problem_data.get('constraints', '')
-                    if constraints_html:
-                        problem_constraints = f'<ul>\n{constraints_html}\n</ul>'
-
+                    # LeetCode API returns complete HTML with description, examples, and constraints
+                    problem_content = problem_data.get('content', '')
                     logging.info("Successfully fetched problem details")
                 else:
                     logging.warning("Could not fetch problem details from LeetCode")
@@ -206,9 +240,7 @@ class LeetCodeNote:
         return {
             "ProblemNumber": problem_number,
             "ProblemTitle": problem_title,
-            "ProblemDescription": problem_description,
-            "ProblemExamples": problem_examples,
-            "ProblemConstraints": problem_constraints,
+            "ProblemContent": problem_content,
             "PatternTagsFront": pattern_tags_front,
             "PatternTagsBack": pattern_tags_back,
             "KeyInsight": key_insight_html,

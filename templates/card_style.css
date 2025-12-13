@@ -199,82 +199,79 @@ html:not(.mobile) .card {
   cursor: pointer;
 }
 
-/* ================================================== PROBLEM DESCRIPTION */
+/* ================================================== PROBLEM CONTENT */
 
-.problem-description {
+.problem-content {
   line-height: 1.7;
   color: var(--text-fg);
+  margin: 1.5em 2em;
 }
 
-/* ================================================== EXAMPLES */
-
-.examples {
-  margin: 1em 0;
+.mobile .problem-content {
+  margin: 1.25em 1.5em;
 }
 
-.example-block {
+.problem-content p {
+  margin: 0.75em 0;
+  line-height: 1.7;
+}
+
+/* Style LeetCode's example blocks */
+.problem-content .example,
+.problem-content strong.example {
+  color: var(--text-fg);
+  font-weight: 700;
+}
+
+.problem-content pre {
   background-color: var(--example-bg);
   border-left: 3px solid var(--example-border);
   padding: 1em 1.25em;
   margin: 0.75em 0;
   border-radius: 0.5em;
-}
-
-.example-header {
-  font-weight: 700;
-  color: var(--text-fg);
-  margin-bottom: 0.5em;
-}
-
-.example-content {
-  color: var(--text-fg-faint);
+  font-family: var(--code-font-family);
   font-size: var(--font-size-small);
   line-height: 1.6;
-  margin: 0;
-  padding: 0;
-  background: transparent;
-}
-
-.example-content p {
-  margin: 0.5em 0;
+  overflow-x: auto;
   white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
-.example-content p:first-child {
-  margin-top: 0;
-}
-
-.example-content code {
+.problem-content pre strong {
   color: var(--text-fg);
 }
 
-/* ================================================== CONSTRAINTS */
-
-.constraints {
-  background-color: var(--constraint-bg);
-  border-left: 3px solid var(--constraint-border);
-  padding: 1em 1.25em;
-  margin: 1em 0;
-  border-radius: 0.5em;
-}
-
-.constraints-header {
-  font-weight: 700;
-  color: var(--constraint-fg);
-  margin-bottom: 0.5em;
-}
-
-.constraints ul {
-  color: var(--constraint-fg);
+/* Style constraints */
+.problem-content ul {
+  color: var(--text-fg);
   font-size: var(--font-size-small);
   margin: 0.5em 0;
   padding-left: 1.5em;
   list-style-type: disc;
 }
 
-.constraints li {
+.problem-content li {
   margin: 0.35em 0;
   padding-left: 0.25em;
+}
+
+.problem-content code {
+  font-family: var(--code-font-family);
+  font-size: 0.9em;
+  background-color: var(--example-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 0.25em;
+  color: var(--text-fg);
+}
+
+.problem-content pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.problem-content sup {
+  font-size: 0.7em;
+  vertical-align: super;
 }
 
 /* ================================================== SOLUTION SECTIONS */

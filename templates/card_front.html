@@ -5,27 +5,14 @@
     </div>
     {{#PatternTagsFront}}
     <div class="pattern-tags">
-      {{PatternTagsFront}}
+      {{{PatternTagsFront}}}
     </div>
     {{/PatternTagsFront}}
   </div>
 
-  {{#ProblemDescription}}
-  <div class="lc-section problem-description">
-    {{ProblemDescription}}
+  {{#ProblemContent}}
+  <div class="problem-content">
+    {{{ProblemContent}}}
   </div>
-  {{/ProblemDescription}}
-
-  {{#ProblemExamples}}
-  <div class="lc-section examples">
-    {{ProblemExamples}}
-  </div>
-  {{/ProblemExamples}}
-
-  {{#ProblemConstraints}}
-  <div class="lc-section constraints">
-    <div class="constraints-header">Constraints:</div>
-    {{ProblemConstraints}}
-  </div>
-  {{/ProblemConstraints}}
+  {{/ProblemContent}}
 </div>

@@ -40,53 +40,85 @@ class SyncManager:
         self.anki.create_or_update_model(self.model_name)
 
     def sync_note(self, note_path: Path) -> bool:
-        """Sync a single note to Anki."""
+        """
+        Sync a single note to Anki.
+
+        Returns:
+            True if synced successfully, False if skipped or failed
+        """
         try:
             note = LeetCodeNote(note_path, self.config)
             note.parse()
 
             if not note.should_sync():
-                logging.warning(f"Skipping {note_path.name} - missing leetcode tag or URL")
+                logging.debug(f"Skipping {note_path.name} - excluded or missing LeetCode URL")
                 return False
 
+            problem_title = note.extract_problem_title()
+
+            logging.info(f"Syncing: {problem_title}")
+
+            # Fetch and build Anki fields
             fields = note.to_anki_fields(self.leetcode_fetcher)
 
+            # Check if card already exists
             query = f'deck:"{self.deck_name}" ProblemTitle:"{fields["ProblemTitle"]}"'
             existing_notes = self.anki.find_notes(query)
 
             if existing_notes:
                 self.anki.update_note(existing_notes[0], fields)
-                logging.info(f"Updated card: {fields['ProblemTitle']}")
+                logging.info(f"✓ Updated: {fields['ProblemTitle']}")
             else:
                 tags = note.extract_tags()
                 self.anki.add_note(self.deck_name, self.model_name, fields, tags)
-                logging.info(f"Created card: {fields['ProblemTitle']}")
+                logging.info(f"✓ Created: {fields['ProblemTitle']}")
 
             return True
 
         except Exception as e:
-            logging.error(f"Failed to sync {note_path.name}: {e}")
+            logging.error(f"✗ Failed to sync {note_path.name}: {e}")
+            import traceback
+            logging.debug(traceback.format_exc())
             return False
 
     def sync_all(self, problems_dir: Path, days: int | None = None) -> dict[str, int]:
-        """Sync all LeetCode problems."""
+        """
+        Sync all LeetCode problems in a directory.
+
+        Args:
+            problems_dir: Directory containing LeetCode note files
+            days: If specified, only sync files modified in the last N days
+
+        Returns:
+            Dictionary with sync statistics
+        """
         stats = {"synced": 0, "skipped": 0, "failed": 0}
 
+        # Find all markdown files
         md_files = list(problems_dir.glob("*.md"))
 
+        # Filter by modification date if specified
         if days:
             cutoff_date = datetime.now() - timedelta(days=days)
             md_files = [
                 f for f in md_files
                 if datetime.fromtimestamp(f.stat().st_mtime) > cutoff_date
             ]
+            logging.info(f"Found {len(md_files)} notes modified in last {days} days")
+        else:
+            logging.info(f"Found {len(md_files)} notes to process")
 
-        logging.info(f"Found {len(md_files)} notes to process")
+        # Sync each file
+        for i, md_file in enumerate(md_files, 1):
+            logging.info(f"[{i}/{len(md_files)}] Processing {md_file.name}")
 
-        for md_file in md_files:
-            if self.sync_note(md_file):
-                stats["synced"] += 1
-            else:
-                stats["skipped"] += 1
+            try:
+                if self.sync_note(md_file):
+                    stats["synced"] += 1
+                else:
+                    stats["skipped"] += 1
+            except Exception as e:
+                logging.error(f"Unexpected error processing {md_file.name}: {e}")
+                stats["failed"] += 1
 
         return stats

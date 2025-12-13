@@ -52,9 +52,11 @@ def main() -> int:
     manager.setup_anki()
 
     # Sync based on arguments
+    problems_dir = Path(manager.config['obsidian']['vault_path']) / manager.config['obsidian']['problems_path']
+
     if args.file_path:
         # Sync single file
-        if not (note_path := Path(args.file_path)).exists():
+        if not (note_path := problems_dir / Path(args.file_path)).exists():
             logging.error(f"File not found: {note_path}")
             return 1
 
@@ -62,7 +64,6 @@ def main() -> int:
 
     if args.all or args.recent:
         # Sync multiple files
-        problems_dir = Path(manager.config['obsidian']['vault_path']) / manager.config['obsidian']['problems_path']
 
         if not problems_dir.exists():
             logging.error(f"Problems directory not found: {problems_dir}")

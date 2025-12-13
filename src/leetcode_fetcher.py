@@ -23,14 +23,12 @@ class LeetCodeFetcher:
         questionId
         title
         titleSlug
-        difficulty
         content
         exampleTestcases
         topicTags {
           name
         }
         hints
-        companyTagStats
       }
     }
     """
@@ -98,62 +96,19 @@ class LeetCodeFetcher:
 
     def _parse_question_data(self, question: dict) -> dict:
         """Parse GraphQL response into structured data."""
+        # Use the entire content HTML as-is from LeetCode
+        # The content already contains description, examples, and constraints in proper HTML
         content_html = question.get('content', '')
-
-        # Extract HTML sections directly from LeetCode's API
-        description_html = self._extract_description_html(content_html)
-        examples_html = self._extract_examples_html(content_html)
-        constraints_html = self._extract_constraints_html(content_html)
 
         return {
             'number': question.get('questionId', ''),
             'title': question.get('title', ''),
             'titleSlug': question.get('titleSlug', ''),
             'difficulty': question.get('difficulty', 'Medium'),
-            'description': description_html,
-            'examples': examples_html,
-            'constraints': constraints_html,
+            'content': content_html,
             'tags': [tag['name'] for tag in question.get('topicTags', [])],
             'hints': question.get('hints', [])
         }
-
-    def _extract_description_html(self, html: str) -> str:
-        """Extract problem description HTML (content before first example)."""
-        # Split at first example
-        pattern = r'<p><strong[^>]*class="example"[^>]*>Example\s+\d+:'
-        parts = re.split(pattern, html, maxsplit=1)
-        if len(parts) > 1:
-            return parts[0].strip()
-
-        # Fallback: split at constraints
-        pattern = r'<p><strong[^>]*>Constraints:</strong></p>'
-        parts = re.split(pattern, html, maxsplit=1)
-        return parts[0].strip()
-
-    def _extract_examples_html(self, html: str) -> list[dict]:
-        """Extract example blocks with HTML intact."""
-        examples = []
-
-        # Pattern: <strong class="example">Example X:</strong> ... <div class="example-block">...</div>
-        pattern = r'<p><strong[^>]*class="example"[^>]*>\s*Example\s+(\d+):\s*</strong></p>\s*<div class="example-block">(.*?)</div>'
-
-        for match in re.finditer(pattern, html, re.DOTALL | re.IGNORECASE):
-            examples.append({
-                'number': int(match.group(1)),
-                'html': match.group(2).strip()
-            })
-
-        return examples
-
-    def _extract_constraints_html(self, html: str) -> str:
-        """Extract constraints HTML (the <ul> with all <li> items)."""
-        # Pattern: <strong>Constraints:</strong> followed by <ul>...</ul>
-        pattern = r'<p><strong[^>]*>\s*Constraints?:\s*</strong></p>\s*<ul>(.*?)</ul>'
-
-        if match := re.search(pattern, html, re.DOTALL | re.IGNORECASE):
-            return match.group(1).strip()
-
-        return ""
 
 def test():
     """Test the fetcher."""
@@ -162,7 +117,7 @@ def test():
     fetcher = LeetCodeFetcher()
 
     # Test with a known problem
-    url = "https://leetcode.com/problems/count-partitions-with-max-min-difference-at-most-k"
+    url = "https://leetcode.com/problems/partition-to-k-equal-sum-subsets"
     print(f"Fetching: {url}")
 
     data = fetcher.fetch_problem(url)
@@ -172,15 +127,8 @@ def test():
         print(f"Title: {data['title']}")
         print(f"Difficulty: {data['difficulty']}")
         print(f"Tags: {', '.join(data['tags'])}")
-        print(f"\nDescription (first 200 chars):\n{data['description'][:200]}...")
-        print(f"\nExamples: {len(data['examples'])}")
-        print(f"Constraints length: {len(data['constraints'])}")
-
-        if data['examples']:
-            print("\n" + "="*60)
-            print("FIRST EXAMPLE HTML:")
-            print("="*60)
-            print(data['examples'][0]['html'][:300])
+        print(f"\nContent (first 200 chars):\n{data['content'][:200]}...")
+        print(f"\nContent length: {len(data['content'])}")
     else:
         print("Failed to fetch problem")
 
